@@ -1,12 +1,9 @@
-﻿Console.WriteLine(".NET Graph Tutorial\n");
+﻿Console.WriteLine(".NET Graph App-only Tutorial\n");
 
 var settings = Settings.LoadSettings();
 
 // Initialize Graph
 InitializeGraph(settings);
-
-// Greet the user by name
-await GreetUserAsync();
 
 int choice = -1;
 
@@ -15,9 +12,8 @@ while (choice != 0)
     Console.WriteLine("Please choose one of the following options:");
     Console.WriteLine("0. Exit");
     Console.WriteLine("1. Display access token");
-    Console.WriteLine("2. List my inbox");
-    Console.WriteLine("3. Send mail");
-    Console.WriteLine("4. Make a Graph call");
+    Console.WriteLine("2. List users");
+    Console.WriteLine("3. Make a Graph call");
 
     try
     {
@@ -40,14 +36,10 @@ while (choice != 0)
             await DisplayAccessTokenAsync();
             break;
         case 2:
-            // List emails from user's inbox
-            await ListInboxAsync();
+            // List users
+            await ListUsersAsync();
             break;
         case 3:
-            // Send an email message
-            await SendMailAsync();
-            break;
-        case 4:
             // Run any Graph code
             await MakeGraphCallAsync();
             break;
@@ -56,30 +48,57 @@ while (choice != 0)
             break;
     }
 }
-
 void InitializeGraph(Settings settings)
 {
-    // TODO
-}
-
-async Task GreetUserAsync()
-{
-    // TODO
+    GraphHelper.InitializeGraphForAppOnlyAuth(settings);
 }
 
 async Task DisplayAccessTokenAsync()
 {
-    // TODO
+    try
+    {
+        var appOnlyToken = await GraphHelper.GetAppOnlyTokenAsync();
+        Console.WriteLine($"App-only token: {appOnlyToken}");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error getting app-only access token: {ex.Message}");
+    }
 }
 
-async Task ListInboxAsync()
+async Task ListUsersAsync()
 {
-    // TODO
-}
+    try
+    {
+        var userPage = await GraphHelper.GetUsersAsync();
 
-async Task SendMailAsync()
-{
-    // TODO
+        if (userPage?.Value == null)
+        {
+            Console.WriteLine("No results returned.");
+            return;
+        }
+
+        // Output each users's details
+        foreach (var user in userPage.Value)
+        {
+            Console.WriteLine($"User: {user.DisplayName ?? "NO NAME"}");
+            Console.WriteLine($"  ID: {user.Id}");
+            Console.WriteLine($"  Email: {user.Mail ?? "NO EMAIL"}");
+        }
+
+        // If NextPageRequest is not null, there are more users
+        // available on the server
+        // Access the next page like:
+        // var nextPageRequest = new UsersRequestBuilder(userPage.OdataNextLink, _appClient.RequestAdapter);
+        // var nextPage = await nextPageRequest.GetAsync();
+        var moreAvailable = !string.IsNullOrEmpty(userPage.OdataNextLink);
+
+        Console.WriteLine($"\nMore users available? {moreAvailable}");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error getting users: {ex.Message}");
+    }
 }
 
 async Task MakeGraphCallAsync()
