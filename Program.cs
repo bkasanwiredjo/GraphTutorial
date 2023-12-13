@@ -101,7 +101,19 @@ async Task ListUsersAsync()
     }
 }
 
-async Task MakeGraphCallAsync()
+ async Task<string> MakeGraphCallAsync() // Get json report from Graph GetReportAsync
 {
-    // TODO
+    try
+    {
+    var Result = await GraphHelper.GetReportAsync();
+        Console.WriteLine($"Report: {Result}");
+        return Result;
+        }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error getting report: {ex.Message}");
+        return "error";
+    }
+  
 }
+
