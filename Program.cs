@@ -14,6 +14,8 @@ while (choice != 0)
     Console.WriteLine("1. Display access token");
     Console.WriteLine("2. List users");
     Console.WriteLine("3. Make a Graph call");
+    Console.WriteLine("4. Get Troubleshooting Events");
+    Console.WriteLine("5. Get Failed Autopilot Events");
 
     try
     {
@@ -43,6 +45,14 @@ while (choice != 0)
             // Run any Graph code
             await MakeGraphCallAsync();
             break;
+        case 4:
+            // Run any Graph code
+            await GetTroubleshootingEventsAsync();
+            break;  
+        case 5:
+            // Run any Graph code
+            await GetFailedAutopilotEventsAsync();
+            break;  
         default:
             Console.WriteLine("Invalid choice! Please try again.");
             break;
@@ -116,4 +126,36 @@ async Task ListUsersAsync()
     }
   
 }
+async Task<string> GetTroubleshootingEventsAsync() // Get json report from Graph GetReportAsync
+{
+    try
+    {
+    var Result = await GraphHelper.GetTroubleshootingEventsAsync();
+        Console.WriteLine($"Report: {Result}");
+        return Result;
+        }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error getting report: {ex.Message}");
+        return "error";
+    }
+  
+}
+async Task<string> GetFailedAutopilotEventsAsync() // Get json report from Graph GetReportAsync
+{
+    try
+    {
+    var Result = await GraphHelper.GetFailedAutopilotEventsAsync();
+        Console.WriteLine($"Report: {Result}");
+        return Result;
+        }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error getting report: {ex.Message}");
+        return "error";
+    }
+  
+}
+
+
 
