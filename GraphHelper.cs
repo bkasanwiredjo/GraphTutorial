@@ -92,4 +92,24 @@ public static async Task<string> GetFailedAutopilotEventsAsync()
 
     return formattedResult;
 }
+public static async Task<string> GetDeviceConfigurationConflictSummaryAsync()
+{
+    _ = _appClient ?? throw new System.NullReferenceException("Graph has not been initialized for app-only auth");
+
+    var httpClient = new HttpClient();
+    var request = new HttpRequestMessage(HttpMethod.Get, "https://graph.microsoft.com/beta/deviceManagement/deviceConfigurationConflictSummary");
+
+    // Get the access token
+    var tokenRequestContext = new TokenRequestContext(new[] { "https://graph.microsoft.com/.default" });
+    var accessToken = await _clientSecretCredential.GetTokenAsync(tokenRequestContext);
+
+    request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken.Token);
+
+    var response = await httpClient.SendAsync(request);
+    var result = await response.Content.ReadAsStringAsync();
+
+    var formattedResult = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(result), Formatting.Indented);
+
+    return formattedResult;
+}
 }
